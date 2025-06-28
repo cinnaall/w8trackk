@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Daily Weight</title>
+    <style>
+        :root {
+            --primary: #2ec4b6;
+            --secondary: #ff9f1c;
+            --light: #cbf3f0;
+            --lighter: #ffffff;
+            --dark: #333333;
+            --gray: #666666;
+            --light-gray: #f8f9fa;
+            --error: #ff6b6b;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--light);
+            padding: 10px;
+            min-height: 100vh;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            margin: 10px auto;
+            background: var(--lighter);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-weight: 600;
+            font-size: 1.4rem;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        input[type="date"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        input[type="date"]:focus,
+        input[type="number"]:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        button:active {
+            background-color: var(--secondary);
+            transform: scale(0.98);
+        }
+
+        .entries-section {
+            margin-top: 20px;
+            border-top: 1px solid var(--light-gray);
+            padding-top: 15px;
+        }
+
+        .entries-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .entries-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--light-gray);
+            border-radius: 8px;
+        }
+
+        .entry-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .entry-item:last-child {
+            border-bottom: none;
+        }
+
+        .entry-date {
+            font-weight: 500;
+        }
+
+        .entry-weight {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .delete-btn {
+            background: var(--error);
+            border: none;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+
+        .delete-btn:active {
+            background: #ff5252;
+        }
+
+        .navbar {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            background-color: var(--primary);
+            padding: 8px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            gap: 5px;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .navbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 12px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            white-space: nowrap;
+        }
+
+        .navbar a:active {
+            background-color: var(--secondary);
+        }
+
+        .no-entries {
+            text-align: center;
+            color: var(--gray);
+            font-style: italic;
+            padding: 20px;
+        }
+
+        /* Mobile-specific styles */
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+                font-size: 15px;
+            }
+            
+            .container {
+                padding: 12px;
+            }
+            
+            h2 {
+                font-size: 1.3rem;
+                margin-bottom: 12px;
+            }
+            
+            input[type="date"],
+            input[type="number"] {
+                padding: 8px;
+                font-size: 0.95rem;
+            }
+            
+            button {
+                padding: 10px;
+                font-size: 0.95rem;
+            }
+            
+            .entry-item {
+                padding: 10px 12px;
+            }
+            
+            .entries-list {
+                max-height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="dashboard.html">🏠 Home</a>
+        <a href="daily.html">➕ Update</a>
+        <a href="calendar.html">📅 Calendar</a>
+        <a href="chart.html">📈 Chart</a>
+        <a href="rankings.html">🏆 Rankings</a>
+        <a href="profile.html">👤 Profile</a>
+    </nav>
+
+    <div class="container">
+        <h2>Daily Weight Tracker</h2>
+        
+        <div class="form-group">
+            <label for="entryDate">Date</label>
+            <input type="date" id="entryDate" />
+        </div>
+        
+        <div class="form-group">
+            <label for="weight">Weight (kg)</label>
+            <input type="number" id="weight" step="0.1" min="30" max="300" placeholder="Enter your weight" />
+        </div>
+        
+        <button onclick="saveEntry()">Save Entry</button>
+        
+        <div class="entries-section">
+            <div class="entries-header">
+                <h3>Your Entries</h3>
+                <small id="entriesCount">0 entries</small>
+            </div>
+            <div class="entries-list" id="entriesList">
+                <div class="no-entries">No entries yet</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import {
+            getAuth, onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import {
+            getFirestore, doc, setDoc, getDoc, deleteField, updateDoc
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDH0DllBIkwR32icnPjxKvjSidRGGVz3E8",
+            authDomain: "w8tracker-c2d46.firebaseapp.com",
+            projectId: "w8tracker-c2d46",
+            storageBucket: "w8tracker-c2d46.appspot.com",
+            messagingSenderId: "911670387123",
+            appId: "1:911670387123:web:7662e3735b1b244fc4abc6",
+            measurementId: "G-BVEJDHO6PR"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser;
+
+        function getCssVariable(name) {
+            return getComputedStyle(document.documentElement).getPropertyValue(name);
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.createElement('div');
+            toast.textContent = message;
+            toast.style.position = 'fixed';
+            toast.style.bottom = '20px';
+            toast.style.right = '20px';
+            toast.style.backgroundColor = isError ? getCssVariable('--error') : getCssVariable('--primary');
+            toast.style.color = 'white';
+            toast.style.padding = '12px 20px';
+            toast.style.borderRadius = '8px';
+            toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            toast.style.zIndex = '1000';
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.5s';
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById("entryDate").value = new Date().toISOString().split('T')[0];
+                await loadEntries();
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        async function saveEntry() {
+            const date = document.getElementById("entryDate").value;
+            const weightInput = document.getElementById("weight");
+            const weight = parseFloat(weightInput.value);
+            
+            if (!date) {
+                showToast('Please select a date', true);
+                return;
+            }
+            
+            if (!weight || isNaN(weight)) {
+                showToast('Please enter a valid weight', true);
+                weightInput.focus();
+                return;
+            }
+            
+            if (weight < 30 || weight > 300) {
+                showToast('Please enter a realistic weight (30-300 kg)', true);
+                weightInput.focus();
+                return;
+            }
+
+            try {
+                const entryRef = doc(db, "users", currentUser.uid);
+                const entryKey = `entries.${date}`;
+                await updateDoc(entryRef, {
+                    [entryKey]: weight
+                });
+
+                showToast('Entry saved successfully!');
+                weightInput.value = "";
+                await loadEntries();
+            } catch (error) {
+                showToast('Failed to save entry. Please try again.', true);
+                console.error(error);
+            }
+        }
+
+        async function loadEntries() {
+            const entryRef = doc(db, "users", currentUser.uid);
+            const docSnap = await getDoc(entryRef);
+            const list = document.getElementById("entriesList");
+            
+            if (!docSnap.exists()) {
+                list.innerHTML = '<div class="no-entries">No entries yet</div>';
+                document.getElementById('entriesCount').textContent = '0 entries';
+                return;
+            }
+
+            const data = docSnap.data().entries || {};
+            if (Object.keys(data).length === 0) {
+                list.innerHTML = '<div class="no-entries">No entries yet</div>';
+                document.getElementById('entriesCount').textContent = '0 entries';
+                return;
+            }
+
+            const dates = Object.keys(data).sort().reverse();
+            document.getElementById('entriesCount').textContent = `${dates.length} ${dates.length === 1 ? 'entry' : 'entries'}`;
+            
+            list.innerHTML = "";
+            
+            dates.forEach((date) => {
+                const entry = document.createElement("div");
+                entry.className = "entry-item";
+                entry.innerHTML = `
+                    <span class="entry-date">${date}</span>
+                    <div>
+                        <span class="entry-weight">${data[date]} kg</span>
+                        <button class="delete-btn" onclick="deleteEntry('${date}')">Delete</button>
+                    </div>
+                `;
+                list.appendChild(entry);
+            });
+        }
+
+        async function deleteEntry(date) {
+            const confirmed = confirm(`Are you sure you want to delete your weight entry for ${date}?`);
+            if (!confirmed) return;
+
+            try {
+                const entryRef = doc(db, "users", currentUser.uid);
+                await updateDoc(entryRef, {
+                    [`entries.${date}`]: deleteField()
+                });
+
+                showToast('Entry deleted successfully');
+                await loadEntries();
+            } catch (error) {
+                showToast('Failed to delete entry. Please try again.', true);
+                console.error(error);
+            }
+        }
+
+        window.saveEntry = saveEntry;
+        window.deleteEntry = deleteEntry;
+    </script>
+</body>
+</html>

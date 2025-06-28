@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Weight Tracker - Login</title>
+    <style>
+        :root {
+            --primary: #2ec4b6;
+            --secondary: #ff9f1c;
+            --light: #cbf3f0;
+            --lighter: #ffffff;
+            --dark: #333333;
+            --gray: #666666;
+            --light-gray: #f8f9fa;
+            --error: #ff6b6b;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--light);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 15px;
+        }
+        
+        .container {
+            background: var(--lighter);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            color: var(--primary);
+        }
+        
+        h2 {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary);
+            border: none;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        button:active {
+            background-color: var(--secondary);
+            transform: scale(0.98);
+        }
+        
+        .toggle {
+            text-align: center;
+            margin-top: 15px;
+            color: var(--gray);
+            font-weight: 500;
+        }
+        
+        .toggle span {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .error {
+            color: var(--error);
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Mobile-specific styles */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .logo {
+                font-size: 2.2rem;
+                margin-bottom: 15px;
+            }
+            
+            h2 {
+                font-size: 1.3rem;
+                margin-bottom: 15px;
+            }
+            
+            input {
+                padding: 10px;
+                font-size: 0.95rem;
+            }
+            
+            button {
+                padding: 10px;
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">⚖️</div>
+        <h2 id="formTitle">Login</h2>
+        
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="Enter your email" />
+            <div id="emailError" class="error">Please enter a valid email</div>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter your password" />
+            <div id="passwordError" class="error">Password must be at least 6 characters</div>
+        </div>
+        
+        <div class="form-group" id="nameGroup" style="display: none;">
+            <label for="name">Name</label>
+            <input type="text" id="name" placeholder="Enter your name" />
+            <div id="nameError" class="error">Please enter your name</div>
+        </div>
+        
+        <button id="submitBtn">
+            <span id="btnText">Login</span>
+            <span id="btnLoader" class="loading" style="display: none;"></span>
+        </button>
+        
+        <div class="toggle" id="toggleForm">
+            Don't have an account? <span>Register</span>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword 
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc 
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDH0DllBIkwR32icnPjxKvjSidRGGVz3E8",
+            authDomain: "w8tracker-c2d46.firebaseapp.com",
+            projectId: "w8tracker-c2d46",
+            storageBucket: "w8tracker-c2d46.appspot.com",
+            messagingSenderId: "911670387123",
+            appId: "1:911670387123:web:7662e3735b1b244fc4abc6",
+            measurementId: "G-BVEJDHO6PR"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth();
+        const db = getFirestore(app);
+
+        const emailEl = document.getElementById('email');
+        const passwordEl = document.getElementById('password');
+        const nameEl = document.getElementById('name');
+        const submitBtn = document.getElementById('submitBtn');
+        const toggleForm = document.getElementById('toggleForm');
+        const formTitle = document.getElementById('formTitle');
+        const btnText = document.getElementById('btnText');
+        const btnLoader = document.getElementById('btnLoader');
+        const nameGroup = document.getElementById('nameGroup');
+
+        let isLogin = true;
+
+        function getCssVariable(name) {
+            return getComputedStyle(document.documentElement).getPropertyValue(name);
+        }
+
+        function showError(element, message) {
+            const errorEl = document.getElementById(`${element.id}Error`);
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+            element.style.borderColor = getCssVariable('--error');
+        }
+
+        function clearError(element) {
+            const errorEl = document.getElementById(`${element.id}Error`);
+            errorEl.style.display = 'none';
+            element.style.borderColor = '#ddd';
+        }
+
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        toggleForm.addEventListener('click', () => {
+            isLogin = !isLogin;
+            formTitle.textContent = isLogin ? 'Login' : 'Register';
+            btnText.textContent = isLogin ? 'Login' : 'Register';
+            toggleForm.innerHTML = isLogin 
+                ? 'Don\'t have an account? <span>Register</span>' 
+                : 'Already have an account? <span>Login</span>';
+            nameGroup.style.display = isLogin ? 'none' : 'block';
+            
+            clearError(emailEl);
+            clearError(passwordEl);
+            if (nameEl) clearError(nameEl);
+        });
+
+        submitBtn.addEventListener('click', async () => {
+            const email = emailEl.value.trim();
+            const password = passwordEl.value.trim();
+            const name = nameEl ? nameEl.value.trim() : '';
+            
+            let isValid = true;
+            
+            if (!email || !validateEmail(email)) {
+                showError(emailEl, 'Please enter a valid email');
+                isValid = false;
+            } else {
+                clearError(emailEl);
+            }
+            
+            if (password.length < 6) {
+                showError(passwordEl, 'Password must be at least 6 characters');
+                isValid = false;
+            } else {
+                clearError(passwordEl);
+            }
+            
+            if (!isLogin && !name) {
+                showError(nameEl, 'Please enter your name');
+                isValid = false;
+            } else if (!isLogin) {
+                clearError(nameEl);
+            }
+            
+            if (!isValid) return;
+            
+            btnText.textContent = isLogin ? 'Logging in...' : 'Registering...';
+            btnLoader.style.display = 'inline-block';
+            submitBtn.disabled = true;
+            
+            try {
+                if (isLogin) {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    window.location.href = 'dashboard.html';
+                } else {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+                    
+                    const avatarUrl = `https://api.dicebear.com/7.x/thumbs/svg?seed=${name.replace(/\s+/g, '')}`;
+                    
+                    await setDoc(doc(db, 'users', user.uid), {
+                        name: name,
+                        email: email,
+                        avatar: avatarUrl,
+                        createdAt: new Date()
+                    });
+                    
+                    window.location.href = 'profile.html';
+                }
+            } catch (err) {
+                let errorMessage = 'An error occurred. Please try again.';
+                
+                switch(err.code) {
+                    case 'auth/email-already-in-use':
+                        errorMessage = 'Email already in use. Please login instead.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Invalid email address.';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = 'Password should be at least 6 characters.';
+                        break;
+                    case 'auth/user-not-found':
+                        errorMessage = 'No user found with this email.';
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessage = 'Incorrect password. Please try again.';
+                        break;
+                }
+                
+                alert(errorMessage);
+            } finally {
+                btnText.textContent = isLogin ? 'Login' : 'Register';
+                btnLoader.style.display = 'none';
+                submitBtn.disabled = false;
+            }
+        });
+
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                submitBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rankings</title>
+    <style>
+        :root {
+            --primary: #2ec4b6;
+            --secondary: #ff9f1c;
+            --light: #cbf3f0;
+            --lighter: #ffffff;
+            --dark: #333333;
+            --gray: #666666;
+            --light-gray: #f8f9fa;
+            --error: #ff6b6b;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--light);
+            padding: 10px;
+            min-height: 100vh;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 10px auto;
+            background: var(--lighter);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-weight: 600;
+            font-size: 1.4rem;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: space-between;
+            background: var(--light-gray);
+            padding: 6px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+
+        .tab:active:not(.active) {
+            background: #e0f2f1;
+        }
+
+        ol {
+            margin-top: 15px;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        li {
+            margin: 10px 0;
+            background: var(--light-gray);
+            padding: 12px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+        }
+
+        .user-name {
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-details {
+            min-width: 0;
+        }
+
+        .user-details small {
+            color: var(--gray);
+            font-size: 0.8rem;
+        }
+
+        .weight-loss {
+            font-weight: 600;
+            color: var(--primary);
+            margin-left: 10px;
+        }
+
+        .pos-marker {
+            background: var(--secondary);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .navbar {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            background-color: var(--primary);
+            padding: 8px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            gap: 5px;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .navbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 12px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            white-space: nowrap;
+        }
+
+        .navbar a:active {
+            background-color: var(--secondary);
+        }
+
+        .loading {
+            text-align: center;
+            color: var(--primary);
+            margin: 20px 0;
+            font-size: 1.1rem;
+        }
+
+        .no-data {
+            text-align: center;
+            color: var(--gray);
+            font-style: italic;
+            padding: 20px 0;
+        }
+
+        .current-user {
+            background: #e0f7fa;
+            border-left: 4px solid var(--primary);
+        }
+
+        /* Mobile-specific styles */
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+            
+            .container {
+                padding: 12px;
+            }
+            
+            h2 {
+                font-size: 1.3rem;
+            }
+            
+            .tab {
+                padding: 6px;
+                font-size: 0.85rem;
+            }
+            
+            li {
+                padding: 10px;
+            }
+            
+            .user-avatar {
+                width: 36px;
+                height: 36px;
+                margin-right: 8px;
+            }
+            
+            .pos-marker {
+                width: 26px;
+                height: 26px;
+                font-size: 0.85rem;
+                margin-right: 8px;
+            }
+            
+            .user-name {
+                font-size: 0.95rem;
+            }
+            
+            .user-details small {
+                font-size: 0.75rem;
+            }
+            
+            .weight-loss {
+                font-size: 0.95rem;
+            }
+            
+            .navbar a {
+                padding: 8px 10px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="dashboard.html">🏠 Home</a>
+        <a href="daily.html">➕ Update</a>
+        <a href="calendar.html">📅 Calendar</a>
+        <a href="chart.html">📈 Chart</a>
+        <a href="rankings.html">🏆 Rankings</a>
+        <a href="profile.html">👤 Profile</a>
+    </nav>
+
+    <div class="container">
+        <h2>Top Users</h2>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('weekly')">Weekly</div>
+            <div class="tab" onclick="showTab('monthly')">Monthly</div>
+            <div class="tab" onclick="showTab('alltime')">All Time</div>
+        </div>
+        
+        <div id="loadingIndicator" class="loading">Loading rankings...</div>
+        <ol id="rankingList"></ol>
+    </div>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDH0DllBIkwR32icnPjxKvjSidRGGVz3E8",
+            authDomain: "w8tracker-c2d46.firebaseapp.com",
+            projectId: "w8tracker-c2d46",
+            storageBucket: "w8tracker-c2d46.appspot.com",
+            messagingSenderId: "911670387123",
+            appId: "1:911670387123:web:7662e3735b1b244fc4abc6",
+            measurementId: "G-BVEJDHO6PR"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let allUsers = [];
+        let currentUserId = null;
+
+        function getCssVariable(name) {
+            return getComputedStyle(document.documentElement).getPropertyValue(name);
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.createElement('div');
+            toast.textContent = message;
+            toast.style.position = 'fixed';
+            toast.style.bottom = '20px';
+            toast.style.right = '20px';
+            toast.style.backgroundColor = isError ? getCssVariable('--error') : getCssVariable('--primary');
+            toast.style.color = 'white';
+            toast.style.padding = '12px 20px';
+            toast.style.borderRadius = '8px';
+            toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            toast.style.zIndex = '1000';
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.5s';
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUserId = user.uid;
+                try {
+                    await fetchUserData();
+                    showTab('weekly');
+                    document.getElementById('loadingIndicator').style.display = 'none';
+                } catch (error) {
+                    console.error("Error loading rankings:", error);
+                    document.getElementById('rankingList').innerHTML = `
+                        <div class="no-data">Failed to load rankings. Please try again later.</div>
+                    `;
+                }
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        async function fetchUserData() {
+            const snapshot = await getDocs(collection(db, "users"));
+            allUsers = [];
+            
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                if (data.entries && Object.keys(data.entries).length >= 2) {
+                    allUsers.push({
+                        id: doc.id,
+                        name: data.name || "Anonymous",
+                        avatar: data.avatar || `https://api.dicebear.com/7.x/thumbs/svg?seed=${doc.id}`,
+                        entries: data.entries
+                    });
+                }
+            });
+        }
+
+        function showTab(period) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector(`.tab:nth-child(${period === 'weekly' ? 1 : period === 'monthly' ? 2 : 3})`).classList.add('active');
+            
+            const now = new Date();
+            const rangeStart = new Date();
+            
+            if (period === 'weekly') {
+                rangeStart.setDate(now.getDate() - 7);
+            } else if (period === 'monthly') {
+                rangeStart.setDate(now.getDate() - 30);
+            } else { // alltime
+                rangeStart.setTime(0);
+            }
+
+            const rankings = allUsers.map(user => {
+                const entries = user.entries;
+                const sortedDates = Object.keys(entries).sort();
+                
+                let filtered = sortedDates;
+                if (period !== 'alltime') {
+                    filtered = sortedDates.filter(date => new Date(date) >= rangeStart && new Date(date) <= now);
+                    if (filtered.length < 2) return null;
+                }
+                
+                const first = entries[filtered[0]];
+                const last = entries[filtered[filtered.length - 1]];
+                const lost = first - last;
+                const days = (new Date(filtered[filtered.length - 1]) - new Date(filtered[0]));
+                const daysCount = Math.max(1, Math.floor(days / (1000 * 60 * 60 * 24)));
+                const rate = lost / daysCount;
+
+                return { 
+                    id: user.id,
+                    name: user.name,
+                    avatar: user.avatar,
+                    lost: lost.toFixed(1),
+                    rate: rate.toFixed(2)
+                };
+            }).filter(Boolean).sort((a, b) => b.lost - a.lost);
+
+            const list = document.getElementById("rankingList");
+            list.innerHTML = "";
+
+            if (rankings.length === 0) {
+                list.innerHTML = `<div class="no-data">No data available for this period</div>`;
+                return;
+            }
+
+            rankings.slice(0, 10).forEach((user, index) => {
+                const li = document.createElement("li");
+                if (user.id === currentUserId) {
+                    li.classList.add("current-user");
+                }
+                
+                li.innerHTML = `
+                    <div class="user-info">
+                        <div class="pos-marker">${index + 1}</div>
+                        <img src="${user.avatar}" alt="${user.name}" class="user-avatar">
+                        <div class="user-details">
+                            <div class="user-name">${user.name}</div>
+                            <small>${user.rate} kg/day</small>
+                        </div>
+                    </div>
+                    <div class="weight-loss">↓ ${user.lost} kg</div>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        window.showTab = showTab;
+    </script>
+</body>
+</html>
