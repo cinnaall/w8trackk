@@ -1,396 +1,495 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Weight Tracker Dashboard</title>
-<style>
-    :root {
-        --primary: #2ec4b6;
-        --secondary: #ff9f1c;
-        --light: #cbf3f0;
-        --lighter: #ffffff;
-        --dark: #333333;
-        --gray: #666666;
-        --light-gray: #f8f9fa;
-        --error: #ff6b6b;
-    }
-    
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
-    
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        background-color: var(--light);
-        padding: 10px;
-        min-height: 100vh;
-        font-size: 16px;
-        line-height: 1.5;
-    }
-
-    .dashboard {
-        width: 100%;
-        max-width: 600px;
-        margin: 10px auto;
-        background: var(--lighter);
-        padding: 15px;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-
-    h1 {
-        text-align: center;
-        color: var(--primary);
-        margin-bottom: 20px;
-        font-weight: 600;
-        font-size: 1.6rem;
-    }
-
-    .stats {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-        margin-bottom: 20px;
-    }
-
-    .stat-card {
-        background: var(--light-gray);
-        border-radius: 10px;
-        padding: 15px;
-        text-align: center;
-    }
-
-    .stat-value {
-        font-size: 1.8rem;
-        font-weight: 600;
-        color: var(--primary);
-        margin: 5px 0;
-    }
-
-    .stat-label {
-        font-size: 0.9rem;
-        color: var(--gray);
-    }
-
-    .nav-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-    }
-
-    .card {
-        background: var(--primary);
-        border-radius: 10px;
-        padding: 20px 10px;
-        text-align: center;
-        font-weight: 600;
-        color: white;
-        text-decoration: none;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        aspect-ratio: 1;
-    }
-
-    .card:active {
-        background: var(--secondary);
-        transform: scale(0.98);
-    }
-
-    .card-icon {
-        font-size: 2rem;
-        margin-bottom: 8px;
-    }
-
-    .logout {
-        margin-top: 20px;
-        text-align: center;
-    }
-
-    button {
-        background-color: var(--primary);
-        border: none;
-        color: white;
-        padding: 12px 20px;
-        border-radius: 10px;
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 1rem;
-        width: 100%;
-        max-width: 200px;
-    }
-
-    button:active {
-        background-color: var(--secondary);
-        transform: scale(0.98);
-    }
-
-    .loading {
-        text-align: center;
-        color: var(--primary);
-        margin: 20px 0;
-        font-size: 1.1rem;
-    }
-
-    /* Mobile-specific styles */
-    @media (max-width: 480px) {
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Weight Tracker Dashboard</title>
+    <style>
+        :root {
+            --primary: #2ec4b6;
+            --secondary: #ff9f1c;
+            --light: #cbf3f0;
+            --lighter: #ffffff;
+            --dark: #333333;
+            --gray: #666666;
+            --light-gray: #f8f9fa;
+            --error: #ff6b6b;
+            --success: #4caf50;
+            --warning: #ff9800;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
         body {
-            padding: 8px;
-            font-size: 15px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--light);
+            padding: 10px;
+            min-height: 100vh;
+            font-size: 16px;
+            line-height: 1.5;
         }
-        
+
         .dashboard {
-            padding: 12px;
+            width: 100%;
+            max-width: 600px;
+            margin: 10px auto;
+            background: var(--lighter);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-        
+
         h1 {
-            font-size: 1.4rem;
-            margin-bottom: 15px;
-        }
-        
-        .stats {
-            grid-template-columns: 1fr;
-            gap: 8px;
-        }
-        
-        .stat-card {
-            padding: 12px;
-        }
-        
-        .stat-value {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-weight: 600;
             font-size: 1.6rem;
         }
-        
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--light-gray);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            position: relative;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin: 5px 0;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .stat-small {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-top: 3px;
+        }
+
+        .change-positive {
+            color: var(--success);
+        }
+
+        .change-negative {
+            color: var(--error);
+        }
+
+        .change-neutral {
+            color: var(--gray);
+        }
+
+        .progress-container {
+            margin-top: 10px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background-color: var(--light-gray);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary);
+            border-radius: 3px;
+        }
+
+        .progress-text {
+            font-size: 0.75rem;
+            margin-top: 2px;
+            color: var(--gray);
+        }
+
         .nav-grid {
-            grid-template-columns: 1fr;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
         }
-        
+
         .card {
-            padding: 15px 10px;
+            background: var(--primary);
+            border-radius: 8px;
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: 600;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            aspect-ratio: 1;
+            transition: all 0.2s ease;
         }
-        
+
+        .card:active {
+            background: var(--secondary);
+            transform: scale(0.98);
+        }
+
+        .card-icon {
+            font-size: 1.5rem;
+            margin-bottom: 6px;
+        }
+
+        .card-text {
+            font-size: 0.85rem;
+        }
+
+        .logout {
+            margin-top: 20px;
+            text-align: center;
+        }
+
         button {
-            padding: 10px 15px;
+            background-color: var(--primary);
+            border: none;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
             font-size: 0.95rem;
+            width: 100%;
+            max-width: 180px;
         }
-    }
-</style>
-</head>
-<body>
-<div class="dashboard">
-    <h1>Welcome to Weight Tracker</h1>
-    
-    <div class="stats" id="statsContainer">
-        <div class="loading">Loading your stats...</div>
-    </div>
-    
-    <div class="nav-grid">
-        <a class="card" href="profile.html">
-            <div class="card-icon">👤</div>
-            <div>Profile</div>
-        </a>
-        <a class="card" href="daily.html">
-            <div class="card-icon">➕</div>
-            <div>Daily Update</div>
-        </a>
-        <a class="card" href="calendar.html">
-            <div class="card-icon">📅</div>
-            <div>Calendar</div>
-        </a>
-        <a class="card" href="chart.html">
-            <div class="card-icon">📈</div>
-            <div>Progress Chart</div>
-        </a>
-        <a class="card" href="rankings.html">
-            <div class="card-icon">🏆</div>
-            <div>Rankings</div>
-        </a>
-    </div>
 
-    <div class="logout">
-        <button onclick="logout()">Logout</button>
-    </div>
-</div>
+        button:active {
+            background-color: var(--secondary);
+            transform: scale(0.98);
+        }
 
-<!-- Firebase -->
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        .loading {
+            text-align: center;
+            color: var(--primary);
+            margin: 20px 0;
+            font-size: 1.1rem;
+        }
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyDH0DllBIkwR32icnPjxKvjSidRGGVz3E8",
-        authDomain: "w8tracker-c2d46.firebaseapp.com",
-        projectId: "w8tracker-c2d46",
-        storageBucket: "w8tracker-c2d46.appspot.com",
-        messagingSenderId: "911670387123",
-        appId: "1:911670387123:web:7662e3735b1b244fc4abc6",
-        measurementId: "G-BVEJDHO6PR"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    function getCssVariable(name) {
-        return getComputedStyle(document.documentElement).getPropertyValue(name);
-    }
-
-    function showToast(message, isError = false) {
-        const toast = document.createElement('div');
-        toast.textContent = message;
-        toast.style.position = 'fixed';
-        toast.style.bottom = '20px';
-        toast.style.right = '20px';
-        toast.style.backgroundColor = isError ? getCssVariable('--error') : getCssVariable('--primary');
-        toast.style.color = 'white';
-        toast.style.padding = '12px 20px';
-        toast.style.borderRadius = '8px';
-        toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-        toast.style.zIndex = '1000';
-        document.body.appendChild(toast);
-        
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transition = 'opacity 0.5s';
-            setTimeout(() => toast.remove(), 500);
-        }, 3000);
-    }
-
-    async function loadUserStats() {
-const user = auth.currentUser;
-if (!user) return;
-
-try {
-    const docRef = doc(db, "users", user.uid);
-    const docSnap = await getDoc(docRef);
-    
-    const statsContainer = document.getElementById('statsContainer');
-    statsContainer.innerHTML = '';
-    
-    if (docSnap.exists()) {
-        const data = docSnap.data();
-        const entries = data.entries || {};
-        const sortedDates = Object.keys(entries).sort();
-        const height = data.height || null;
-        const goalWeight = data.goalWeight || null;
-        
-        // Get weight data
-        const currentWeight = sortedDates.length > 0 ? entries[sortedDates[sortedDates.length - 1]] : null;
-        const initialWeight = sortedDates.length > 0 ? entries[sortedDates[0]] : null;
-        
-        // Calculate weight changes
-        let weightChange = null;
-        let percentageChange = null;
-        let daysTracked = null;
-        let weeklyRate = null;
-        
-        if (initialWeight && currentWeight) {
-            weightChange = (currentWeight - initialWeight).toFixed(1);
-            percentageChange = ((Math.abs(currentWeight - initialWeight) / initialWeight) * 100).toFixed(1);
+        /* Mobile-specific styles */
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+                font-size: 15px;
+            }
             
-            // Calculate time period
-            if (sortedDates.length > 1) {
-                const firstDate = new Date(sortedDates[0]);
-                const lastDate = new Date(sortedDates[sortedDates.length - 1]);
-                daysTracked = Math.ceil((lastDate - firstDate) / (1000 * 60 * 60 * 24));
-                weeklyRate = ((currentWeight - initialWeight) / (daysTracked / 7)).toFixed(2);
+            .dashboard {
+                padding: 12px;
+            }
+            
+            h1 {
+                font-size: 1.4rem;
+                margin-bottom: 15px;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            
+            .stat-card {
+                padding: 12px;
+            }
+            
+            .stat-value {
+                font-size: 1.6rem;
+            }
+            
+            .nav-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .card {
+                padding: 10px 6px;
+            }
+            
+            .card-icon {
+                font-size: 1.3rem;
+                margin-bottom: 4px;
+            }
+            
+            .card-text {
+                font-size: 0.8rem;
+            }
+            
+            button {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+                max-width: 160px;
             }
         }
+
+        @media (max-width: 350px) {
+            .nav-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <h1>Welcome to Weight Tracker</h1>
         
-        // Calculate BMI
-        const bmi = currentWeight && height ? calculateBMI(currentWeight, height) : null;
-        const bmiCategory = bmi ? getBMICategory(bmi) : null;
+        <div class="stats" id="statsContainer">
+            <div class="loading">Loading your stats...</div>
+        </div>
         
-        // Calculate progress to goal
-        let goalProgress = null;
-        if (goalWeight && currentWeight && initialWeight) {
-            const totalChangeNeeded = initialWeight - goalWeight;
-            const currentProgress = initialWeight - currentWeight;
-            goalProgress = {
-                percentage: Math.min(100, (currentProgress / totalChangeNeeded) * 100).toFixed(1),
-                remaining: (totalChangeNeeded - currentProgress).toFixed(1)
+        <div class="nav-grid">
+            <a class="card" href="profile.html">
+                <div class="card-icon">👤</div>
+                <div class="card-text">Profile</div>
+            </a>
+            <a class="card" href="daily.html">
+                <div class="card-icon">➕</div>
+                <div class="card-text">Daily</div>
+            </a>
+            <a class="card" href="calendar.html">
+                <div class="card-icon">📅</div>
+                <div class="card-text">Calendar</div>
+            </a>
+            <a class="card" href="chart.html">
+                <div class="card-icon">📈</div>
+                <div class="card-text">Chart</div>
+            </a>
+            <a class="card" href="rankings.html">
+                <div class="card-icon">🏆</div>
+                <div class="card-text">Rankings</div>
+            </a>
+            <a class="card" href="settings.html">
+                <div class="card-icon">⚙️</div>
+                <div class="card-text">Settings</div>
+            </a>
+        </div>
+
+        <div class="logout">
+            <button onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDH0DllBIkwR32icnPjxKvjSidRGGVz3E8",
+            authDomain: "w8tracker-c2d46.firebaseapp.com",
+            projectId: "w8tracker-c2d46",
+            storageBucket: "w8tracker-c2d46.appspot.com",
+            messagingSenderId: "911670387123",
+            appId: "1:911670387123:web:7662e3735b1b244fc4abc6",
+            measurementId: "G-BVEJDHO6PR"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        function getCssVariable(name) {
+            return getComputedStyle(document.documentElement).getPropertyValue(name);
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.createElement('div');
+            toast.textContent = message;
+            toast.style.position = 'fixed';
+            toast.style.bottom = '20px';
+            toast.style.right = '20px';
+            toast.style.backgroundColor = isError ? getCssVariable('--error') : getCssVariable('--primary');
+            toast.style.color = 'white';
+            toast.style.padding = '12px 20px';
+            toast.style.borderRadius = '8px';
+            toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            toast.style.zIndex = '1000';
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.5s';
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        }
+
+        function calculateBMI(weight, height) {
+            if (!height || height <= 0) return null;
+            // Convert height from cm to meters
+            const heightInMeters = height / 100;
+            return (weight / (heightInMeters * heightInMeters)).toFixed(1);
+        }
+
+        function getBMICategory(bmi) {
+            if (bmi === null) return "N/A";
+            if (bmi < 18.5) return "Underweight";
+            if (bmi < 25) return "Normal";
+            if (bmi < 30) return "Overweight";
+            return "Obese";
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function calculateWeightMetrics(entries, goalWeight) {
+            if (!entries || Object.keys(entries).length === 0) return null;
+            
+            const sortedDates = Object.keys(entries).sort();
+            const firstDate = sortedDates[0];
+            const lastDate = sortedDates[sortedDates.length - 1];
+            
+            const startWeight = entries[firstDate];
+            const currentWeight = entries[lastDate];
+            const weightDifference = currentWeight - startWeight;
+            const percentageChange = ((weightDifference / startWeight) * 100).toFixed(1);
+            
+            // Calculate time period in days
+            const days = Math.ceil((new Date(lastDate) - new Date(firstDate)) / (1000 * 60 * 60 * 24));
+            
+            // Calculate progress toward goal if available
+            let goalProgress = null;
+            if (goalWeight) {
+                const totalToLose = startWeight - goalWeight;
+                const lostSoFar = startWeight - currentWeight;
+                goalProgress = {
+                    percentage: Math.min(100, Math.max(0, (lostSoFar / totalToLose) * 100)).toFixed(1),
+                    remaining: (totalToLose - lostSoFar).toFixed(1)
+                };
+            }
+            
+            return {
+                startWeight: startWeight.toFixed(1),
+                currentWeight: currentWeight.toFixed(1),
+                weightDifference: Math.abs(weightDifference).toFixed(1),
+                percentageChange: percentageChange,
+                direction: weightDifference < 0 ? 'lost' : weightDifference > 0 ? 'gained' : 'no change',
+                days: days,
+                startDate: firstDate,
+                endDate: lastDate,
+                goalProgress: goalProgress,
+                entriesCount: sortedDates.length
             };
         }
-        
-        // Build stats display
-        statsContainer.innerHTML = `
-            <div class="stat-card">
-                <div class="stat-label">Current Weight</div>
-                <div class="stat-value">${currentWeight ? currentWeight + ' kg' : '--'}</div>
-                ${goalProgress ? `
-                    <div class="progress-container">
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${goalProgress.percentage}%"></div>
-                        </div>
-                        <small>${goalProgress.percentage}% to goal (${goalProgress.remaining}kg left)</small>
-                    </div>
-                ` : ''}
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Start Weight</div>
-                <div class="stat-value">${initialWeight ? initialWeight + ' kg' : '--'}</div>
-                ${sortedDates.length > 0 ? `<small>Since ${formatDate(sortedDates[0])}</small>` : ''}
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Weight Change</div>
-                <div class="stat-value">
-                    ${weightChange ? 
-                        `${weightChange > 0 ? '↑' : weightChange < 0 ? '↓' : ''} 
-                        ${Math.abs(weightChange)} kg (${percentageChange}%)` : '--'}
-                </div>
-                ${weeklyRate ? `<small>${Math.abs(weeklyRate)} kg/week</small>` : ''}
-                ${daysTracked ? `<small>Over ${daysTracked} days</small>` : ''}
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">BMI</div>
-                <div class="stat-value">${bmi || '--'}</div>
-                ${bmiCategory ? `<div class="bmi-category ${bmiCategory}">${bmiCategory.charAt(0).toUpperCase() + bmiCategory.slice(1)}</div>` : ''}
-                ${goalWeight ? `<small>Goal: ${goalWeight} kg</small>` : ''}
-            </div>
-        `;
-    } else {
-        statsContainer.innerHTML = `
-            <div class="stat-card" style="grid-column: span 2;">
-                <div class="stat-label">Welcome!</div>
-                <div class="stat-value">Add your first weight entry</div>
-            </div>
-        `;
-    }
-} catch (error) {
-    showToast('Failed to load stats. Please try again.', true);
-    console.error(error);
-}
-}
 
-// Helper function to format dates
-function formatDate(dateString) {
-const options = { year: 'numeric', month: 'short', day: 'numeric' };
-return new Date(dateString).toLocaleDateString(undefined, options);
-}
-
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            loadUserStats();
-        } else {
-            window.location.href = "login.html";
+        async function loadUserStats() {
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            try {
+                const docRef = doc(db, "users", user.uid);
+                const docSnap = await getDoc(docRef);
+                
+                const statsContainer = document.getElementById('statsContainer');
+                statsContainer.innerHTML = '';
+                
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    const entries = data.entries || {};
+                    const height = data.height || null;
+                    const goalWeight = data.goalWeight || null;
+                    
+                    const metrics = calculateWeightMetrics(entries, goalWeight);
+                    const currentBMI = height ? calculateBMI(metrics?.currentWeight || 0, height) : null;
+                    const bmiCategory = currentBMI ? getBMICategory(currentBMI) : "N/A";
+                    
+                    if (metrics) {
+                        statsContainer.innerHTML = `
+                            <div class="stat-card">
+                                <div class="stat-label">Current Weight</div>
+                                <div class="stat-value">${metrics.currentWeight} kg</div>
+                                ${currentBMI ? `
+                                    <div class="stat-small">
+                                        BMI: ${currentBMI} (${bmiCategory})
+                                    </div>
+                                ` : ''}
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Weight Change</div>
+                                <div class="stat-value ${metrics.direction === 'lost' ? 'change-positive' : metrics.direction === 'gained' ? 'change-negative' : 'change-neutral'}">
+                                    ${metrics.direction === 'lost' ? '↓' : metrics.direction === 'gained' ? '↑' : ''} 
+                                    ${metrics.weightDifference} kg (${metrics.percentageChange}%)
+                                </div>
+                                <div class="stat-small">
+                                    ${metrics.direction} in ${metrics.days} days
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Start Weight</div>
+                                <div class="stat-value">${metrics.startWeight} kg</div>
+                                <div class="stat-small">${formatDate(metrics.startDate)}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Goal Progress</div>
+                                <div class="stat-value">${goalWeight ? goalWeight + ' kg' : 'Not set'}</div>
+                                ${metrics.goalProgress ? `
+                                    <div class="progress-container">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: ${metrics.goalProgress.percentage}%"></div>
+                                        </div>
+                                        <div class="progress-text">
+                                            ${metrics.goalProgress.percentage}% complete (${metrics.goalProgress.remaining} kg left)
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    } else {
+                        statsContainer.innerHTML = `
+                            <div class="stat-card" style="grid-column: span 2;">
+                                <div class="stat-label">Welcome!</div>
+                                <div class="stat-value">Add your first weight entry</div>
+                                ${height ? `
+                                    <div class="stat-small">
+                                        Set your height in Profile for BMI calculations
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    }
+                }
+            } catch (error) {
+                showToast('Failed to load stats. Please try again.', true);
+                console.error(error);
+            }
         }
-    });
 
-    window.logout = function () {
-        signOut(auth).then(() => {
-            showToast('Logged out successfully');
-            setTimeout(() => {
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                loadUserStats();
+            } else {
                 window.location.href = "login.html";
-            }, 1000);
-        }).catch((error) => {
-            showToast('Logout failed. Please try again.', true);
+            }
         });
-    }
-</script>
+
+        window.logout = function () {
+            signOut(auth).then(() => {
+                showToast('Logged out successfully');
+                setTimeout(() => {
+                    window.location.href = "login.html";
+                }, 1000);
+            }).catch((error) => {
+                showToast('Logout failed. Please try again.', true);
+            });
+        }
+    </script>
 </body>
 </html>
