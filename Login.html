@@ -312,7 +312,7 @@
             try {
                 if (isLogin) {
                     await signInWithEmailAndPassword(auth, email, password);
-                    window.location.href = 'dashboard.html';
+                    window.location.href = 'Index.html';
                 } else {
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     const user = userCredential.user;
