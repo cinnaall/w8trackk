@@ -14,6 +14,7 @@
             --gray: #666666;
             --light-gray: #f8f9fa;
             --error: #ff6b6b;
+            --warning: #ffcc00;
         }
         
         * {
@@ -61,6 +62,7 @@
             border-radius: 10px;
             padding: 15px;
             text-align: center;
+            position: relative;
         }
 
         .stat-value {
@@ -75,16 +77,45 @@
             color: var(--gray);
         }
 
+        .bmi-category {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-top: 4px;
+            display: inline-block;
+        }
+
+        .underweight {
+            background-color: #b3e0ff;
+            color: #0066cc;
+        }
+
+        .normal {
+            background-color: #ccffcc;
+            color: #009900;
+        }
+
+        .overweight {
+            background-color: #fff2cc;
+            color: #e69138;
+        }
+
+        .obese {
+            background-color: #ffcccc;
+            color: #cc0000;
+        }
+
         .nav-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
         }
 
         .card {
             background: var(--primary);
-            border-radius: 10px;
-            padding: 20px 10px;
+            border-radius: 8px;
+            padding: 12px 8px;
             text-align: center;
             font-weight: 600;
             color: white;
@@ -94,6 +125,7 @@
             align-items: center;
             justify-content: center;
             aspect-ratio: 1;
+            transition: all 0.2s ease;
         }
 
         .card:active {
@@ -102,8 +134,12 @@
         }
 
         .card-icon {
-            font-size: 2rem;
-            margin-bottom: 8px;
+            font-size: 1.5rem;
+            margin-bottom: 6px;
+        }
+
+        .card-text {
+            font-size: 0.85rem;
         }
 
         .logout {
@@ -115,13 +151,13 @@
             background-color: var(--primary);
             border: none;
             color: white;
-            padding: 12px 20px;
-            border-radius: 10px;
+            padding: 10px 18px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 0.95rem;
             width: 100%;
-            max-width: 200px;
+            max-width: 180px;
         }
 
         button:active {
@@ -166,16 +202,32 @@
             }
             
             .nav-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
             }
             
             .card {
-                padding: 15px 10px;
+                padding: 10px 6px;
+            }
+            
+            .card-icon {
+                font-size: 1.3rem;
+                margin-bottom: 4px;
+            }
+            
+            .card-text {
+                font-size: 0.8rem;
             }
             
             button {
-                padding: 10px 15px;
-                font-size: 0.95rem;
+                padding: 8px 15px;
+                font-size: 0.9rem;
+                max-width: 160px;
+            }
+        }
+
+        @media (max-width: 350px) {
+            .nav-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -191,23 +243,27 @@
         <div class="nav-grid">
             <a class="card" href="profile.html">
                 <div class="card-icon">👤</div>
-                <div>Profile</div>
+                <div class="card-text">Profile</div>
             </a>
             <a class="card" href="daily.html">
                 <div class="card-icon">➕</div>
-                <div>Daily Update</div>
+                <div class="card-text">Daily</div>
             </a>
             <a class="card" href="calendar.html">
                 <div class="card-icon">📅</div>
-                <div>Calendar</div>
+                <div class="card-text">Calendar</div>
             </a>
             <a class="card" href="chart.html">
                 <div class="card-icon">📈</div>
-                <div>Progress Chart</div>
+                <div class="card-text">Chart</div>
             </a>
             <a class="card" href="rankings.html">
                 <div class="card-icon">🏆</div>
-                <div>Rankings</div>
+                <div class="card-text">Rankings</div>
+            </a>
+            <a class="card" href="settings.html">
+                <div class="card-icon">⚙️</div>
+                <div class="card-text">Settings</div>
             </a>
         </div>
 
@@ -261,6 +317,21 @@
             }, 3000);
         }
 
+        function calculateBMI(weight, height) {
+            if (!weight || !height) return null;
+            // Convert height from cm to meters
+            const heightInMeters = height / 100;
+            return (weight / (heightInMeters * heightInMeters)).toFixed(1);
+        }
+
+        function getBMICategory(bmi) {
+            if (!bmi) return '';
+            if (bmi < 18.5) return 'underweight';
+            if (bmi < 25) return 'normal';
+            if (bmi < 30) return 'overweight';
+            return 'obese';
+        }
+
         async function loadUserStats() {
             const user = auth.currentUser;
             if (!user) return;
@@ -276,38 +347,41 @@
                     const data = docSnap.data();
                     const entries = data.entries || {};
                     const sortedDates = Object.keys(entries).sort();
+                    const height = data.height || null;
+                    const currentWeight = sortedDates.length > 0 ? entries[sortedDates[sortedDates.length - 1]] : null;
+                    const initialWeight = sortedDates.length > 0 ? entries[sortedDates[0]] : null;
+                    const weightChange = initialWeight && currentWeight ? (initialWeight - currentWeight).toFixed(1) : null;
                     
-                    if (sortedDates.length > 0) {
-                        const firstWeight = entries[sortedDates[0]];
-                        const lastWeight = entries[sortedDates[sortedDates.length - 1]];
-                        const weightChange = (firstWeight - lastWeight).toFixed(1);
-                        
-                        statsContainer.innerHTML = `
-                            <div class="stat-card">
-                                <div class="stat-label">Current Weight</div>
-                                <div class="stat-value">${lastWeight} kg</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-label">Total Change</div>
-                                <div class="stat-value">${weightChange} kg</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-label">Total Entries</div>
-                                <div class="stat-value">${sortedDates.length}</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-label">Goal Weight</div>
-                                <div class="stat-value">${data.goalWeight || '--'} kg</div>
-                            </div>
-                        `;
-                    } else {
-                        statsContainer.innerHTML = `
-                            <div class="stat-card" style="grid-column: span 2;">
-                                <div class="stat-label">Welcome!</div>
-                                <div class="stat-value">Add your first weight entry</div>
-                            </div>
-                        `;
-                    }
+                    // Calculate BMI if we have current weight and height
+                    const bmi = currentWeight && height ? calculateBMI(currentWeight, height) : null;
+                    const bmiCategory = bmi ? getBMICategory(bmi) : null;
+                    
+                    statsContainer.innerHTML = `
+                        <div class="stat-card">
+                            <div class="stat-label">Current Weight</div>
+                            <div class="stat-value">${currentWeight ? currentWeight + ' kg' : '--'}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Total Change</div>
+                            <div class="stat-value">${weightChange ? weightChange + ' kg' : '--'}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">BMI</div>
+                            <div class="stat-value">${bmi || '--'}</div>
+                            ${bmiCategory ? `<div class="bmi-category ${bmiCategory}">${bmiCategory.charAt(0).toUpperCase() + bmiCategory.slice(1)}</div>` : ''}
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Goal Weight</div>
+                            <div class="stat-value">${data.goalWeight ? data.goalWeight + ' kg' : '--'}</div>
+                        </div>
+                    `;
+                } else {
+                    statsContainer.innerHTML = `
+                        <div class="stat-card" style="grid-column: span 2;">
+                            <div class="stat-label">Welcome!</div>
+                            <div class="stat-value">Add your first weight entry</div>
+                        </div>
+                    `;
                 }
             } catch (error) {
                 showToast('Failed to load stats. Please try again.', true);
